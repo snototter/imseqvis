@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imseqvis"
+
+description = "Simple image sequence visualizer based on Qt"
+readme = "README.md"
+
+version = "0.1.0"
+license = {file = "LICENSE"}
+
+authors = [
+    { name = "snototter", email = "snototter@users.noreply.github.com" }
+]
+
+requires-python = ">=3.7"
+
+dependencies = [
+    "numpy",
+    "qimage2ndarray",
+    "qtpy"
+]
+
+
+# For a list of valid classifiers, see https://pypi.org/classifiers/
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+
+[project.urls]
+homepage = "https://github.com/snototter/imseqvis"
+
+[tool.setuptools]
+packages = ["imseqvis"]
