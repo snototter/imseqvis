@@ -111,7 +111,7 @@ class SequenceControlWidget(QWidget):
         #   inconsistent step sizes).
         if event.key() == Qt.Key_Escape:
             self.resetSlider()
-        elif event.key() == Qt.Key_P:
+        elif event.key() in [Qt.Key_P, Qt.Key_X]:
             self.togglePlayback()
         elif event.key() == Qt.Key_B:
             self.skip(self.previous_button, -1)
