@@ -1,13 +1,10 @@
+import numpy as np
+import qimage2ndarray
+
 from qtpy.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLineEdit, QLabel, QToolButton
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QPixmap, QImage, QFont, QFontMetrics, QIcon, QPainter, QPen, QColor
 
-
-import numpy as np
-import qimage2ndarray
-#from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLineEdit, QLabel
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QImage
 
 def pixmapFromNumPy(img_np: np.array) -> QPixmap:
     """
