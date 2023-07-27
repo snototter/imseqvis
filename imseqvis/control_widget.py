@@ -148,7 +148,8 @@ class SequenceControlWidget(QWidget):
     
     def startPlayback(self):
         if self.slider.value() >= self.max_value:
-            return
+            # Restart playback from the beginning
+            self.updateSlider(1)
         self.playback_timer.start(self.playback_timeout)
         self.playback_button.setIcon(QIcon.fromTheme('media-playback-pause'))
     
