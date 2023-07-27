@@ -2,7 +2,7 @@ import numpy as np
 import qimage2ndarray
 
 from qtpy.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLineEdit, QLabel, QToolButton
-from qtpy.QtCore import Qt
+from qtpy.QtCore import Qt, QPoint
 from qtpy.QtGui import QPixmap, QImage, QFont, QFontMetrics, QIcon, QPainter, QPen, QColor
 
 
@@ -36,6 +36,42 @@ def pixmapFromNumPy(img_np: np.array) -> QPixmap:
     return QPixmap.fromImage(qimage)
 
 
+class ImageLabel(QWidget):
+    """
+    Widget to display an image, always resized to the widgets dimensions.
+    
+    This class has been taken as is from the iminspect project:
+    https://github.com/snototter/iminspect/
+    """
+    def __init__(self, pixmap=None, parent=None):
+        super(ImageLabel, self).__init__(parent)
+        self._pixmap = pixmap
+
+    def pixmap(self):
+        return self._pixmap
+
+    def setPixmap(self, pixmap):
+        self._pixmap = pixmap
+        self.update()
+
+    def paintEvent(self, event):
+        super(ImageLabel, self).paintEvent(event)
+        if self._pixmap is None:
+            return
+        painter = QPainter(self)
+        pm_size = self._pixmap.size()
+        pm_size.scale(event.rect().size(), Qt.KeepAspectRatio)
+        # Draw resized pixmap using nearest neighbor interpolation instead
+        # of bilinear/smooth interpolation (omit the Qt.SmoothTransformation
+        # parameter).
+        scaled = self._pixmap.scaled(
+                pm_size, Qt.KeepAspectRatio)
+        pos = QPoint(
+            (event.rect().width() - scaled.width()) // 2,
+            (event.rect().height() - scaled.height()) // 2)
+        painter.drawPixmap(pos, scaled)
+
+
 # TODO ImageViewer class similar to iminspect (w/stripped down functionality)
 class ImageViewer(QWidget):
     """
@@ -52,7 +88,7 @@ class ImageViewer(QWidget):
         self.initUI()
     
     def initUI(self):
-        self.label = QLabel('')
+        self.label = ImageLabel()
         layout = QHBoxLayout()
         layout.addWidget(self.label)
         self.setLayout(layout)
