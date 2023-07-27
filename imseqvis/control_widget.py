@@ -125,10 +125,10 @@ class SequenceControlWidget(QWidget):
             self.resetSlider()
 
     def sliderValueChanged(self, value):
+        self.is_viewer_ready = False
         self.previous_button.setEnabled(value > 1)
         self.next_button.setEnabled(value < self.max_value)
         self.current_value_label.setText(str(value))
-        self.is_viewer_ready = False
         self.indexChanged.emit(value)
         
     def resetSlider(self):
@@ -161,7 +161,7 @@ class SequenceControlWidget(QWidget):
     
     def onPlaybackTimeout(self):
         if self.playback_wait_for_viewer_ready and not self.is_viewer_ready:
-            # Skip this timeout if the viewer is not ready yet
+            # Skip this timeout if the viewer has not shown the last image yet
             return
         value = self.slider.value() + 1
         if value <= self.max_value:

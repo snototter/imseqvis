@@ -10,25 +10,28 @@ class SequenceViewer(QWidget):
     
     def __init__(
             self,
-            image_sequence):
+            image_sequence,
+            playback_timeout: int = 100):
         """
         Args:
           image_sequence: A random access sequence of images. Indexing must be
             0-based and return the image at the given index as a numpy array
             of dtype=np.uint8.
+          playback_timeout: Timeout of the playback timer in milliseconds.
         """
         super().__init__()
         self.image_sequence = image_sequence
-        self.initUI()
+        self.initUI(playback_timeout)
         # Ensure that the first image is shown
         self.onIndexChanged(1)
     
-    def initUI(self):
+    def initUI(self, playback_timeout):
         self.viewer = ImageViewer()
         self.viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.controls = SequenceControlWidget(
             max_value=len(self.image_sequence),
+            playback_timeout=playback_timeout,
             playback_wait_for_viewer_ready=True)
         self.controls.indexChanged.connect(self.onIndexChanged)
         self.controls.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
