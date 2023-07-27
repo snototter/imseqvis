@@ -1,4 +1,4 @@
-from qtpy.QtWidgets import QWidget, QVBoxLayout
+from qtpy.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 
 from .image_viewer import ImageViewer
 from .control_widget import SequenceControlWidget
@@ -25,11 +25,13 @@ class SequenceViewer(QWidget):
     
     def initUI(self):
         self.viewer = ImageViewer()
+        self.viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.controls = SequenceControlWidget(
             max_value=len(self.image_sequence),
             playback_wait_for_viewer_ready=True)
         self.controls.indexChanged.connect(self.onIndexChanged)
+        self.controls.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         layout = QVBoxLayout()
         layout.addWidget(self.viewer)
