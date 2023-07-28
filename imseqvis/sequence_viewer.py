@@ -52,12 +52,12 @@ class SequenceViewer(QWidget):
           include_zoom_buttons: If True, buttons to zoom the image are shown.
         """
         super().__init__()
-        self.image_sequence = image_sequence
+        self.image_sequence = [] if (image_sequence is None) else image_sequence
         self.initUI(
             playback_timeout,
             include_sequence_navigation_buttons,
             include_zoom_buttons)
-        self.setSequence(image_sequence)
+        self.setSequence(self.image_sequence)
     
     def setSequence(self, image_sequence):
         self.image_sequence = image_sequence
@@ -105,7 +105,10 @@ class SequenceViewer(QWidget):
 
     def onIndexChanged(self, index: int):
         # The control index is 1-based, but the sequence index is 0-based.
-        img = self.image_sequence[index - 1]
+        index -= 1
+        if index < 0 or index >= len(self.image_sequence):
+            return
+        img = self.image_sequence[index]
         self.viewer.showImage(img, reset_scale=False)
         self.controls.onViewerReady()
         

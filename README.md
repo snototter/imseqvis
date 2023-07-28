@@ -33,7 +33,15 @@ viewer = SequenceViewer(image_sequence=sequence)
 layout.addWidget(viewer)
 ...
 
-# Later on, another sequence can be shown via:
+# Alternatively, the widget can also be created without a data source:
+viewer = SequenceViewer(image_sequence=None)
+...
+# Later on, the image sequence can be set via:
+viewer.setSequence(new_sequence)
+```
+
+To show a different sequence within the same viewer, simply call:
+```python
 viewer.setSequence(new_sequence)
 ```
 
