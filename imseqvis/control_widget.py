@@ -1,5 +1,5 @@
-from qtpy.QtWidgets import (QApplication, QWidget, QHBoxLayout, QVBoxLayout,
-        QPushButton, QSlider, QLineEdit, QLabel, QToolButton)
+from qtpy.QtWidgets import (
+    QWidget, QHBoxLayout, QSlider, QLineEdit, QLabel, QToolButton)
 from qtpy.QtCore import Qt, Signal, QTimer
 from qtpy.QtGui import QIcon, QFontMetrics
 
@@ -14,7 +14,7 @@ class SequenceControlWidget(QWidget):
 
     Note that the emitted index is 1-based.
     """
-    
+
     # Signaled whenever the selected frame (i.e. slider value) changes. Note
     # that this index is 1-based.
     indexChanged = Signal(int)
@@ -42,7 +42,7 @@ class SequenceControlWidget(QWidget):
             include_zoom_buttons: bool = True):
         """
         Initialize the controls widget.
-        
+
         Args:
           max_value: The slider will range from 1 to max_value (incl.)
           playback_timeout: Timeout of the playback timer in milliseconds.
@@ -59,12 +59,12 @@ class SequenceControlWidget(QWidget):
         super().__init__()
         self.max_value = max_value
         self.playback_timeout = playback_timeout
-        
+
         self.playback_timer = QTimer()
         self.playback_timer.timeout.connect(self.onPlaybackTimeout)
         self.playback_wait_for_viewer_ready = playback_wait_for_viewer_ready
         self.is_viewer_ready = True
-        
+
         self.initUI(include_sequence_navigation_buttons, include_zoom_buttons)
 
     def setMaxValue(self, max_value):
@@ -73,7 +73,7 @@ class SequenceControlWidget(QWidget):
         self.label_current_value.setFixedWidth(
             QFontMetrics(self.font()).width(str(self.max_value)) + 10)
         self.updateSlider(1)
-    
+
     def onViewerReady(self):
         self.is_viewer_ready = True
 
@@ -90,19 +90,19 @@ class SequenceControlWidget(QWidget):
         self.button_playback.setToolTip('Toggle play/pause')
         self.button_playback.clicked.connect(self.togglePlayback)
 
-        # Reset button        
+        # Reset button
         button_reload = QToolButton()
         button_reload.setIcon(QIcon.fromTheme('view-refresh'))
         button_reload.setToolTip('Reset sequence')
         button_reload.clicked.connect(self.resetSlider)
-        
+
         # Navigation buttons (step forward/backward)
         self.button_previous_frame = QToolButton()
         self.button_previous_frame.setIcon(QIcon.fromTheme('go-previous'))
         self.button_previous_frame.setToolTip('Previous frame')
         self.button_previous_frame.clicked.connect(
             lambda: self.skip(self.button_previous_frame, -1))
-        
+
         self.button_next_frame = QToolButton()
         self.button_next_frame.setIcon(QIcon.fromTheme('go-next'))
         self.button_next_frame.setToolTip('Next frame')
@@ -207,35 +207,35 @@ class SequenceControlWidget(QWidget):
         self.button_next_frame.setEnabled(value < self.max_value)
         self.label_current_value.setText(str(value))
         self.indexChanged.emit(value)
-        
+
     def resetSlider(self):
         self.stopPlayback()
         self.updateSlider(1)
-    
+
     def skip(self, button, step):
         if not button.isEnabled():
             return
         self.updateSlider(self.slider.value() + step)
         # A manual fwd/bwd request always stops the playback
         self.stopPlayback()
-    
+
     def stopPlayback(self):
         self.playback_timer.stop()
         self.button_playback.setIcon(QIcon.fromTheme('media-playback-start'))
-    
+
     def startPlayback(self):
         if self.slider.value() >= self.max_value:
             # Restart playback from the beginning
             self.updateSlider(1)
         self.playback_timer.start(self.playback_timeout)
         self.button_playback.setIcon(QIcon.fromTheme('media-playback-pause'))
-    
+
     def togglePlayback(self):
         if self.playback_timer.isActive():
             self.stopPlayback()
         else:
             self.startPlayback()
-    
+
     def onPlaybackTimeout(self):
         if self.playback_wait_for_viewer_ready and not self.is_viewer_ready:
             # Skip this timeout if the viewer has not shown the last image yet
@@ -245,7 +245,7 @@ class SequenceControlWidget(QWidget):
             self.updateSlider(value)
         else:
             self.stopPlayback()
-        
+
     def updateSlider(self, value):
         # Update the slider and label with the new value
         if 1 <= value <= self.max_value:
@@ -262,4 +262,3 @@ class SequenceControlWidget(QWidget):
             pass
         # Always reset the input text box
         self.manual_input.setText('')
-

@@ -3,7 +3,7 @@ import qimage2ndarray
 from pathlib import Path
 
 from qtpy.QtWidgets import QWidget, QScrollArea, QApplication
-from qtpy.QtCore import Qt, QPoint, QPointF, Signal, Slot, QRect, QMimeData
+from qtpy.QtCore import Qt, QPointF, Signal, Slot, QRect, QMimeData
 from qtpy.QtGui import (
     QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette,
     QMouseEvent)
@@ -12,7 +12,7 @@ from qtpy.QtGui import (
 def pixmapFromNumpy(img_np: np.array) -> QPixmap:
     """
     Converts the given NumPy array image into a QPixmap.
-    
+
     Args:
       img_np: The (1, 3, or 4-channel) image. This parameter must not be None.
     """
@@ -79,7 +79,7 @@ class ImageCanvas(QWidget):
 
     # User wants to scroll (Qt.Horizontal or Qt.Vertical, mouse wheel delta).
     scrollRequest = Signal(int, int)
-    
+
     # Mouse moved to this pixel position
     mouseMoved = Signal(QPointF)
 
@@ -91,10 +91,10 @@ class ImageCanvas(QWidget):
 
     # Right mouse button clicked at this pixel position.
     mouseClickedRight = Signal(QPointF)
-        
+
     # Scaling factor of displayed image changed
     imageScaleChanged = Signal(float)
-    
+
     # File or folder has been dropped onto canvas
     pathDropped = Signal(Path)
 
@@ -183,7 +183,7 @@ class ImageCanvas(QWidget):
         if event.button() == Qt.LeftButton:
             QApplication.restoreOverrideCursor()
         self._is_dragging = False
-    
+
     def wheelEvent(self, event):
         """Event handler for mouse wheel events."""
         delta = event.angleDelta()
@@ -268,7 +268,7 @@ class ImageCanvas(QWidget):
         if self._pixmap:
             return self._scale * self._pixmap.size()
         return super(ImageCanvas, self).minimumSizeHint()
-    
+
 
 class ImageViewer(QScrollArea):
     """
@@ -278,7 +278,7 @@ class ImageViewer(QScrollArea):
     the iminspect project:
     https://github.com/snototter/iminspect
     """
-    
+
     # Mouse moved to this pixel position
     mouseMoved = Signal(QPointF)
 
@@ -290,13 +290,13 @@ class ImageViewer(QScrollArea):
 
     # Right mouse button clicked at this pixel position.
     mouseClickedRight = Signal(QPointF)
-    
+
     # Scaling factor of displayed image changed
     imageScaleChanged = Signal(float)
-    
+
     # The view changed due to the user scrolling or zooming
     viewChanged = Signal()
-    
+
     # A file or folder has been dropped onto the canvas
     pathDropped = Signal(Path)
 
@@ -384,7 +384,7 @@ class ImageViewer(QScrollArea):
     def showImage(self, img: np.array, reset_scale: bool = True) -> None:
         """
         Displays the given image.
-        
+
         Args:
           img: The image to be displayed.
           reset_scale: If True, the zoom setting of the viewer will be reset.

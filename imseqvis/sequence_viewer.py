@@ -58,16 +58,16 @@ class SequenceViewer(QWidget):
             include_sequence_navigation_buttons,
             include_zoom_buttons)
         self.setSequence(self.image_sequence)
-    
+
     def setSequence(self, image_sequence):
         self.image_sequence = image_sequence
         self.controls.setMaxValue(len(self.image_sequence))
         # Ensure that the first image is shown.
         self.onIndexChanged(1)
-    
+
     def initUI(
             self,
-            playback_timeout: int, 
+            playback_timeout: int,
             include_sequence_navigation_buttons: bool,
             include_zoom_buttons: bool):
         # Image viewer can expand across the available space.
@@ -111,4 +111,3 @@ class SequenceViewer(QWidget):
         img = self.image_sequence[index]
         self.viewer.showImage(img, reset_scale=False)
         self.controls.onViewerReady()
-        
