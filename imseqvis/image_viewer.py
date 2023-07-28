@@ -5,7 +5,8 @@ from pathlib import Path
 from qtpy.QtWidgets import QWidget, QScrollArea, QApplication
 from qtpy.QtCore import Qt, QPoint, QPointF, Signal, Slot, QRect, QMimeData
 from qtpy.QtGui import (
-    QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette)
+    QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette,
+    QMouseEvent)
 
 
 def pixmapFromNumpy(img_np: np.array) -> QPixmap:
@@ -31,62 +32,25 @@ def pixmapFromNumpy(img_np: np.array) -> QPixmap:
         font.setBold(True)
         font.setFamily('Helvetica')
         qp.setFont(font)
-        qp.drawText(qimage.rect(), Qt.AlignCenter, "Error!\nCannot display a\n{:d}-channel image.".format(img_np.shape[2]))
+        qp.drawText(
+            qimage.rect(),
+            Qt.AlignCenter,
+            f"Error!\nCannot display a\n{img_np.shape[2]}-channel image.")
         qp.end()
     if qimage.isNull():
-        raise ValueError('Invalid NumPy image received, cannot convert it to QImage')
+        raise ValueError(
+            'Invalid Numpy image received, cannot convert it to QImage')
     return QPixmap.fromImage(qimage)
-
-
-class ImageLabel(QWidget):
-    """
-    Simple widget to display an image as a QLabel, always resized to the
-    widget's dimensions.
-    
-    This class has been taken as is from the iminspect project:
-    https://github.com/snototter/iminspect/
-    """
-    def __init__(self, pixmap=None, parent=None):
-        super(ImageLabel, self).__init__(parent)
-        self._pixmap = pixmap
-
-    def pixmap(self):
-        return self._pixmap
-
-    def setPixmap(self, pixmap):
-        self._pixmap = pixmap
-        self.update()
-
-    def paintEvent(self, event):
-        super(ImageLabel, self).paintEvent(event)
-        if self._pixmap is None:
-            return
-        painter = QPainter(self)
-        pm_size = self._pixmap.size()
-        pm_size.scale(event.rect().size(), Qt.KeepAspectRatio)
-        # Draw resized pixmap using nearest neighbor interpolation instead
-        # of bilinear/smooth interpolation (omit the Qt.SmoothTransformation
-        # parameter).
-        scaled = self._pixmap.scaled(
-                pm_size, Qt.KeepAspectRatio)
-        pos = QPoint(
-            (event.rect().width() - scaled.width()) // 2,
-            (event.rect().height() - scaled.height()) // 2)
-        painter.drawPixmap(pos, scaled)
 
 
 def isMimeDataLocalPath(mime_data: QMimeData) -> bool:
     """
-    Returns True if the given mime_data belongs to a file which can
-    be dropped onto the ImageViewer/Canvas, i.e. it must be either a file
-    or a URI of a local file.
+    Returns True if the given mime_data belongs to a file/folder which can
+    be dropped onto the ImageViewer/Canvas.
     """
     if mime_data.hasUrls():
-        is_local_file = [Path(url.toLocalFile()).exists() for url in mime_data.urls()]
-        if any(is_local_file):
-            return True
-    if mime_data.hasText():
-        return mime_data.text().startswith('file://')
+        local = [Path(url.toLocalFile()).exists() for url in mime_data.urls()]
+        return any(local)
     return False
 
 
@@ -134,17 +98,21 @@ class ImageCanvas(QWidget):
     # File or folder has been dropped onto canvas
     pathDropped = Signal(Path)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._scale = 1.0
         self._pixmap = QPixmap()
         self._painter = QPainter()
+        # Indicates whether the user is currently dragging the image
         self._is_dragging = False
-        self._prev_drag_pos = None  # Parent widget position, i.e. usually the position within the ImageViewer (scroll area)
+        # Previous dragging position, relative to the parent widget, i.e. the
+        # position within the ImageViewer's scroll area.
+        self._prev_drag_pos = None
         self.setMouseTracking(True)
         self.setAcceptDrops(True)
 
-    def setScale(self, scale):
+    def setScale(self, scale: float) -> None:
+        """Sets the scale factor of the displayed image."""
         prev_scale = self._scale
         self._scale = scale
         self.adjustSize()
@@ -152,14 +120,17 @@ class ImageCanvas(QWidget):
         if prev_scale != self._scale:
             self.imageScaleChanged.emit(self._scale)
 
-    def loadPixmap(self, pixmap):
+    def showPixmap(self, pixmap: QPixmap) -> None:
+        """Displays the given pixmap."""
         self._pixmap = pixmap
         self.repaint()
 
-    def pixmap(self):
+    def pixmap(self) -> QPixmap:
+        """Returns the currently displayed pixmap."""
         return self._pixmap
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """Event handle for mouse move events."""
         pos = self.transformPos(event.pos())
         if Qt.RightButton & event.buttons():
             # Skip mouse move signals while panning the image
@@ -168,7 +139,13 @@ class ImageCanvas(QWidget):
         else:
             self.mouseMoved.emit(pos)
 
-    def drag(self, new_pos):
+    def drag(self, new_pos: QPointF) -> None:
+        """
+        Handles dragging/panning the image.
+
+        Emits the scroll request to properly adjusts the scroll bar
+        positions according to the given mouse position.
+        """
         new_pos = self.mapToParent(new_pos)
         # Previous position will always be set when the mouse is pressed
         delta_pos = new_pos - self._prev_drag_pos
@@ -186,13 +163,15 @@ class ImageCanvas(QWidget):
         dx and self.scrollRequest.emit(dx * 6, Qt.Horizontal)
         dy and self.scrollRequest.emit(dy * 6, Qt.Vertical)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """Event handler for mouse press events."""
         if event.button() == Qt.RightButton:
             # Viewer can be panned via the right button
             self._prev_drag_pos = self.mapToParent(event.pos())
             QApplication.setOverrideCursor(Qt.ClosedHandCursor)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        """Event handler for mouse release events."""
         if not self._is_dragging:
             pos = self.transformPos(event.pos())
             if event.button() == Qt.LeftButton:
@@ -204,19 +183,40 @@ class ImageCanvas(QWidget):
         if event.button() == Qt.LeftButton:
             QApplication.restoreOverrideCursor()
         self._is_dragging = False
+    
+    def wheelEvent(self, event):
+        """Event handler for mouse wheel events."""
+        delta = event.angleDelta()
+        dx, dy = delta.x(), delta.y()
+        modifiers = event.modifiers()
+        if modifiers & Qt.ControlModifier:
+            if modifiers & Qt.ShiftModifier:
+                dy *= 10
+            if dy:
+                self.zoomRequest.emit(dy)
+        else:
+            if modifiers & Qt.ShiftModifier:
+                dx *= 10
+                dy *= 10
+            dx and self.scrollRequest.emit(dx, Qt.Horizontal)
+            dy and self.scrollRequest.emit(dy, Qt.Vertical)
+        event.accept()
 
     def dragEnterEvent(self, event):
+        """Event handler to support drag&drop of files/folders."""
         if isMimeDataLocalPath(event.mimeData()):
             event.accept()
         else:
             event.ignore()
 
     def dropEvent(self, event):
+        """Event handler to support drag&drop of files/folders."""
         if isMimeDataLocalPath(event.mimeData()):
             fpath = getLocalPathFromMimeData(event.mimeData())
             self.pathDropped.emit(fpath)
 
     def paintEvent(self, event):
+        """Renders the image onto the visible canvas."""
         if not self._pixmap:
             return super(ImageCanvas, self).paintEvent(event)
         qp = self._painter
@@ -241,20 +241,21 @@ class ImageCanvas(QWidget):
             exposed_rect = QRect(0, 0, self._pixmap.width(), self._pixmap.height())
         qp.end()
 
-    def transformPos(self, point):
-        """Convert from widget coordinates to painter coordinates."""
+    def transformPos(self, point: QPointF) -> QPointF:
+        """Converts from widget coordinates to painter coordinates."""
         return QPointF(point.x()/self._scale, point.y()/self._scale) - self.offsetToCenter()
 
-    def pixelAtWidgetPos(self, widget_pos):
+    def pixelAtWidgetPos(self, widget_pos: QPointF) -> QPointF:
         """Returns the pixel position at the given widget coordinate."""
         return self.transformPos(widget_pos)
 
-    def pixelToWidgetPos(self, pixel_pos):
+    def pixelToWidgetPos(self, pixel_pos: QPointF) -> QPointF:
         """Compute the widget position of the given pixel position."""
         return (pixel_pos + self.offsetToCenter()) * self._scale
 
-    def offsetToCenter(self):
-        area = super(ImageCanvas, self).size()
+    def offsetToCenter(self) -> QPointF:
+        """Utility to allow transforming widget to pixel coordinates."""
+        area = super().size()
         aw, ah = area.width(), area.height()
         w = self._pixmap.width() * self._scale
         h = self._pixmap.height() * self._scale
@@ -269,23 +270,6 @@ class ImageCanvas(QWidget):
         if self._pixmap:
             return self._scale * self._pixmap.size()
         return super(ImageCanvas, self).minimumSizeHint()
-
-    def wheelEvent(self, event):
-        delta = event.angleDelta()
-        dx, dy = delta.x(), delta.y()
-        modifiers = event.modifiers()
-        if modifiers & Qt.ControlModifier:
-            if modifiers & Qt.ShiftModifier:
-                dy *= 10
-            if dy:
-                self.zoomRequest.emit(dy)
-        else:
-            if modifiers & Qt.ShiftModifier:
-                dx *= 10
-                dy *= 10
-            dx and self.scrollRequest.emit(dx, Qt.Horizontal)
-            dy and self.scrollRequest.emit(dy, Qt.Vertical)
-        event.accept()
     
 
 class ImageViewer(QScrollArea):
@@ -409,7 +393,7 @@ class ImageViewer(QScrollArea):
         """
         pixmap = pixmapFromNumpy(img)
         self._img_np = img.copy()
-        self._canvas.loadPixmap(pixmap)
+        self._canvas.showPixmap(pixmap)
 
         # Ensure that image has a minimum size of about 32x32 px (unless it is
         # actually smaller)
