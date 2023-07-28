@@ -222,9 +222,7 @@ class ImageCanvas(QWidget):
         qp = self._painter
         qp.begin(self)
         qp.setRenderHint(QPainter.Antialiasing)
-        qp.setRenderHint(QPainter.HighQualityAntialiasing)
-        # qp.setRenderHint(QPainter.SmoothPixmapTransform)
-        qp.fillRect(self.rect(), QBrush(self.palette().color(QPalette.Background)))
+        qp.fillRect(self.rect(), QBrush(self.palette().color(QPalette.Window)))
         qp.scale(self._scale, self._scale)
         # Adapted fast drawing from:
         # https://www.qt.io/blog/2006/05/13/fast-transformed-pixmapimage-drawing

@@ -38,5 +38,11 @@ classifiers = [
 [project.urls]
 homepage = "https://github.com/snototter/imseqvis"
 
+[project.optional-dependencies]
+pyqt5 = ["PyQt5"]
+pyqt6 = ["PyQt6"]
+pyside2 = ["PySide2"]
+pyside6 = ["PySide6"]
+
 [tool.setuptools]
 packages = ["imseqvis"]

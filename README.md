@@ -20,6 +20,27 @@ or [PySide](https://doc.qt.io/qtforpython-6/).
 The default installation **will not install** any of these backends, you have
 to select one on your own.
 
+Optionally, you can install `imseqvis` with a specific backend. Currently,
+`pyqt5`, `pyqt6`, `pyside2`, and `pyside6` are supported:
+```bash
+# PyQt5
+python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyqt5]"
+
+# OR
+
+# PyQt5
+python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyqt6]"
+
+# OR
+
+# PySide2
+python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyside2]"
+
+# OR
+
+# PySide6
+python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyside6]"
+```
 
 ### Usage
 
@@ -51,12 +72,3 @@ More detailed usage examples are provided within `examples/`:
 * `examples/demo_folder.py` will playback all images within a local folder.
   This demo additionally requires the [vito](https://pypi.org/project/vito/)
   package to load image files.
-
-
-### TODOs
-* [x] Switch to a more sophisticated image viewer
-* [x] Implement a stateful viewer (keep zoom & ROI during playback/seek)
-* [ ] Allow optional qt/pyside selection
-* [ ] Allow initialization without any sequence
-
-
