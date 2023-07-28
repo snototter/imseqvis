@@ -45,6 +45,7 @@ if __name__ == "__main__":
     SHOW_SEQUENCE_BUTTONS = True
     SHOW_ZOOM_BUTTONS = True
     PLAYBACK_TIMEOUT = 150
+    LOG_EVERY_MOUSE_MOVE = False  # Very verbose!
 
     # The image data source
     sequence = DummySequence(142)
@@ -66,17 +67,17 @@ if __name__ == "__main__":
     viewer.nextSequenceRequest.connect(onNextSequence)
     viewer.previousSequenceRequest.connect(onPreviousSequence)
 
-    # Demo, how to use some of the other available signals:
+    # Demo, how to use the other available signals:
     def onMouseClicked(pixel, button):
         print(f'Mouse clicked "{button}" at pixel {pixel.x()}, {pixel.y()}')
     viewer.mouseClickedLeft.connect(lambda px: onMouseClicked(px, 'left'))
     viewer.mouseClickedMiddle.connect(lambda px: onMouseClicked(px, 'middle'))
     viewer.mouseClickedRight.connect(lambda px: onMouseClicked(px, 'right'))
     
-    ## Mouse move events would be very verbose, so we skip this signal:
-    # def onMouseMoved(pixel):
-    #     print(f'Mouse moved to pixel position {pixel.x()}, {pixel.y()}')
-    # viewer.mouseMoved.connect(onMouseMoved)
+    if LOG_EVERY_MOUSE_MOVE:
+        def onMouseMoved(pixel):
+            print(f'Mouse moved to pixel position {pixel.x()}, {pixel.y()}')
+        viewer.mouseMoved.connect(onMouseMoved)
 
     def onPathDropped(path):
         print(f'Path dropped onto canvas: {path}')
