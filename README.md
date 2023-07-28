@@ -1,4 +1,9 @@
-# Image Sequence Visualizer
+# Image & Sequence Visualization
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/imseqvis/blob/main/LICENSE?raw=true)
+
+This package provides GUI widgets to show images and playback image sequences.
+
+![Screenshot Sequence Viewer](https://github.com/snototter/imseqvis/blob/main/examples/screenshot.jpg?raw=true "SequenceViewer widget")
 
 ### Installation
 It is highly recommended to set up a separate virtual environment with an up-to-date `pip`:
