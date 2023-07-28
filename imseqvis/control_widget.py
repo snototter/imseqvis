@@ -16,18 +16,33 @@ class SequenceControlWidget(QWidget):
     # Signaled whenever the selected frame (i.e. slider value) changes.
     indexChanged = Signal(int)
 
+    # Signaled whenever the user requests the previous sequence (if
+    # these buttons are enabled).
+    previousSequenceRequested = Signal()
+
+    # Signaled whenever the user requests the next sequence (if
+    # these buttons are enabled).
+    nextSequenceRequested = Signal()
+
     def __init__(
             self,
             max_value: int,
             playback_timeout: int = 100,
-            playback_wait_for_viewer_ready: bool = True):
+            playback_wait_for_viewer_ready: bool = True,
+            include_sequence_buttons: bool = False):
         """
+        Initialize the controls widget.
+        
         Args:
           max_value: The slider will range from 1 to max_value (incl.)
           playback_timeout: Timeout of the playback timer in milliseconds.
           playback_wait_for_viewer_ready: If True, the timer playback will
             only advance to the next index if `onViewerReady` has been
             called since the last emitted `indexChanged` signal.
+          include_sequence_buttons: If True, controls to skip to the previous
+            or next sequence will be shown. If clicked, the corresponding
+            `previousSequenceRequested` or `nextSequenceRequested` signal will
+            be emitted.
         """
         super().__init__()
         self.max_value = max_value
@@ -38,12 +53,23 @@ class SequenceControlWidget(QWidget):
         self.playback_wait_for_viewer_ready = playback_wait_for_viewer_ready
         self.is_viewer_ready = True
         
-        self.initUI()
+        self.initUI(include_sequence_buttons)
+
+    def setMaxValue(self, max_value):
+        self.max_value = max_value
+        self.slider.setRange(1, self.max_value)
+        self.current_value_label.setFixedWidth(QFontMetrics(self.font()).width(str(self.max_value)) + 10)
+        self.sliderValueChanged(1)
     
     def onViewerReady(self):
         self.is_viewer_ready = True
 
-    def initUI(self):
+    def initUI(
+            self,
+            include_sequence_buttons: bool):
+        # Theme icon names:
+        # https://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+
         # Automatic playback button (toggles between play/pause)
         self.playback_button = QToolButton()
         self.playback_button.setIcon(QIcon.fromTheme('media-playback-start'))
@@ -62,6 +88,15 @@ class SequenceControlWidget(QWidget):
         self.next_button = QToolButton()
         self.next_button.setIcon(QIcon.fromTheme('go-next'))
         self.next_button.clicked.connect(lambda: self.skip(self.next_button, +1))
+
+        # Navigation buttons (skip to previous/next sequence)
+        previous_seq_button = QToolButton()
+        previous_seq_button.setIcon(QIcon.fromTheme('go-up'))
+        previous_seq_button.clicked.connect(self.previousSequenceRequested)
+
+        next_seq_button = QToolButton()
+        next_seq_button.setIcon(QIcon.fromTheme('go-down'))
+        next_seq_button.clicked.connect(self.nextSequenceRequested)
 
         # The slider
         self.slider = QSlider(Qt.Horizontal)
@@ -83,6 +118,9 @@ class SequenceControlWidget(QWidget):
 
         # Align all controls horizontally
         layout = QHBoxLayout()
+        if include_sequence_buttons:
+            layout.addWidget(previous_seq_button)
+            layout.addWidget(next_seq_button)
         layout.addWidget(self.previous_button)
         layout.addWidget(self.next_button)
         layout.addWidget(self.playback_button)
