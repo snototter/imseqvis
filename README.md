@@ -33,7 +33,7 @@ python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvi
 
 # OR
 
-# PyQt5
+# PyQt6
 python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyqt6]"
 
 # OR
