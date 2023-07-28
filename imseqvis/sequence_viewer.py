@@ -1,4 +1,3 @@
-from PyQt5 import QtGui
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 from qtpy.QtCore import Signal
 
