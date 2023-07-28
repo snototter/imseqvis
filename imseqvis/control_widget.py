@@ -59,7 +59,7 @@ class SequenceControlWidget(QWidget):
         self.max_value = max_value
         self.slider.setRange(1, self.max_value)
         self.current_value_label.setFixedWidth(QFontMetrics(self.font()).width(str(self.max_value)) + 10)
-        self.sliderValueChanged(1)
+        self.updateSlider(1)
     
     def onViewerReady(self):
         self.is_viewer_ready = True
@@ -134,7 +134,6 @@ class SequenceControlWidget(QWidget):
         self.setLayout(layout)
         # Emit signal & update labels by skipping to the first value.
         self.sliderValueChanged(1)
-        #self.show() # TODO remove if not needed
 
     def keyPressEvent(self, event):
         """Custom event filter for keyboard inputs."""

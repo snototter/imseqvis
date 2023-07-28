@@ -49,9 +49,11 @@ class SequenceViewer(QWidget):
             self,
             playback_timeout: int, 
             include_sequence_buttons: bool):
+        # Image viewer can expand across the available space
         self.viewer = ImageViewer()
         self.viewer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        # The playback control widget
         self.controls = SequenceControlWidget(
             max_value=len(self.image_sequence),
             playback_timeout=playback_timeout,
@@ -62,6 +64,7 @@ class SequenceViewer(QWidget):
         self.controls.nextSequenceRequested.connect(self.nextSequenceRequested)
         self.controls.previousSequenceRequested.connect(self.previousSequenceRequested)
 
+        # Layouting
         layout = QVBoxLayout()
         layout.addWidget(self.viewer)
         layout.addWidget(self.controls)
