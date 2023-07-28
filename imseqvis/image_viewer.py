@@ -4,7 +4,8 @@ from pathlib import Path
 
 from qtpy.QtWidgets import QWidget, QScrollArea, QApplication
 from qtpy.QtCore import Qt, QPoint, QPointF, Signal, Slot, QRect, QMimeData
-from qtpy.QtGui import QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette
+from qtpy.QtGui import (
+    QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette)
 
 
 def pixmapFromNumpy(img_np: np.array) -> QPixmap:
@@ -39,7 +40,8 @@ def pixmapFromNumpy(img_np: np.array) -> QPixmap:
 
 class ImageLabel(QWidget):
     """
-    Widget to display an image, always resized to the widgets dimensions.
+    Simple widget to display an image as a QLabel, always resized to the
+    widget's dimensions.
     
     This class has been taken as is from the iminspect project:
     https://github.com/snototter/iminspect/
@@ -108,20 +110,26 @@ def getLocalPathFromMimeData(mime_data: QMimeData) -> Path:
 class ImageCanvas(QWidget):
     """Widget to display a zoomable/scrollable image."""
 
-    # User wants to zoom in/out by a given amount (mouse wheel delta)
+    # User wants to zoom in/out by a given amount (mouse wheel delta).
     zoomRequest = Signal(int)
 
-    # User wants to scroll (Qt.Horizontal or Qt.Vertical, mouse wheel delta)
+    # User wants to scroll (Qt.Horizontal or Qt.Vertical, mouse wheel delta).
     scrollRequest = Signal(int, int)
     
     # Mouse moved to this pixel position
     mouseMoved = Signal(QPointF)
-    
-    # User selected a rectangle (ImageCanvas must be created with rect_selectable=True)
-    rectSelected = Signal(tuple)
-    
+
+    # Left mouse button clicked at this pixel position.
+    mouseClickedLeft = Signal(QPointF)
+
+    # Middle mouse button (wheel) clicked at this pixel position.
+    mouseClickedMiddle = Signal(QPointF)
+
+    # Right mouse button clicked at this pixel position.
+    mouseClickedRight = Signal(QPointF)
+        
     # Scaling factor of displayed image changed
-    imgScaleChanged = Signal(float)
+    imageScaleChanged = Signal(float)
     
     # File or folder has been dropped onto canvas
     pathDropped = Signal(Path)
@@ -132,7 +140,7 @@ class ImageCanvas(QWidget):
         self._pixmap = QPixmap()
         self._painter = QPainter()
         self._is_dragging = False
-        self._prev_drag_pos = None  # Parent widget position, i.e. usually the position within the ImageViewer (scroll area )
+        self._prev_drag_pos = None  # Parent widget position, i.e. usually the position within the ImageViewer (scroll area)
         self.setMouseTracking(True)
         self.setAcceptDrops(True)
 
@@ -142,7 +150,7 @@ class ImageCanvas(QWidget):
         self.adjustSize()
         self.update()
         if prev_scale != self._scale:
-            self.imgScaleChanged.emit(self._scale)
+            self.imageScaleChanged.emit(self._scale)
 
     def loadPixmap(self, pixmap):
         self._pixmap = pixmap
@@ -153,8 +161,9 @@ class ImageCanvas(QWidget):
 
     def mouseMoveEvent(self, event):
         pos = self.transformPos(event.pos())
-        if (Qt.LeftButton & event.buttons()) or (Qt.RightButton & event.buttons()):
+        if Qt.RightButton & event.buttons():
             # Skip mouse move signals while panning the image
+            self._is_dragging = True
             self.drag(event.pos())
         else:
             self.mouseMoved.emit(pos)
@@ -178,17 +187,23 @@ class ImageCanvas(QWidget):
         dy and self.scrollRequest.emit(dy * 6, Qt.Vertical)
 
     def mousePressEvent(self, event):
-        if event.button() in [Qt.LeftButton, Qt.RightButton]:
-            # Left & right button clicks start dragging the viewer
+        if event.button() == Qt.RightButton:
+            # Viewer can be panned via the right button
             self._prev_drag_pos = self.mapToParent(event.pos())
-            self._is_dragging = True
             QApplication.setOverrideCursor(Qt.ClosedHandCursor)
 
     def mouseReleaseEvent(self, event):
-        #TODO emit signal for mouse click? (if dx/dy == 0)
-        if event.button() in [Qt.LeftButton, Qt.RightButton]:
+        if not self._is_dragging:
+            pos = self.transformPos(event.pos())
+            if event.button() == Qt.LeftButton:
+                self.mouseClickedLeft.emit(pos)
+            elif event.button() == Qt.MiddleButton:
+                self.mouseClickedMiddle.emit(pos)
+            elif event.button() == Qt.RightButton:
+                self.mouseClickedRight.emit(pos)
+        if event.button() == Qt.LeftButton:
             QApplication.restoreOverrideCursor()
-            self._is_dragging = False
+        self._is_dragging = False
 
     def dragEnterEvent(self, event):
         if isMimeDataLocalPath(event.mimeData()):
@@ -285,13 +300,17 @@ class ImageViewer(QScrollArea):
     # Mouse moved to this pixel position
     mouseMoved = Signal(QPointF)
 
-    # # Mouse clicked at this pixel position # TODO which clicks do we need?
-    # mouseClickedLeft = Signal(QPointF)
-    # mouseClickedMiddle = Signal(QPointF)
-    # mouseClickedRight = Signal(QPointF)
+    # Left mouse button clicked at this pixel position.
+    mouseClickedLeft = Signal(QPointF)
+
+    # Middle mouse button (wheel) clicked at this pixel position.
+    mouseClickedMiddle = Signal(QPointF)
+
+    # Right mouse button clicked at this pixel position.
+    mouseClickedRight = Signal(QPointF)
     
     # Scaling factor of displayed image changed
-    imgScaleChanged = Signal(float)
+    imageScaleChanged = Signal(float)
     
     # The view changed due to the user scrolling or zooming
     viewChanged = Signal()
@@ -327,8 +346,11 @@ class ImageViewer(QScrollArea):
         self._canvas.zoomRequest.connect(self.zoom)
         self._canvas.scrollRequest.connect(self.scrollRelative)
         self._canvas.mouseMoved.connect(self.mouseMoved)
-        self._canvas.imgScaleChanged.connect(self.imgScaleChanged)
-        self._canvas.imgScaleChanged.connect(lambda _scale: self.viewChanged.emit())
+        self._canvas.mouseClickedLeft.connect(self.mouseClickedLeft)
+        self._canvas.mouseClickedMiddle.connect(self.mouseClickedMiddle)
+        self._canvas.mouseClickedRight.connect(self.mouseClickedRight)
+        self._canvas.imageScaleChanged.connect(self.imageScaleChanged)
+        self._canvas.imageScaleChanged.connect(lambda _scale: self.viewChanged.emit())
         self._canvas.pathDropped.connect(self.pathDropped)
 
         self.setWidget(self._canvas)
@@ -377,7 +399,14 @@ class ImageViewer(QScrollArea):
         bar.setValue(value)
         self.viewChanged.emit()
 
-    def showImage(self, img, reset_scale=True):
+    def showImage(self, img: np.array, reset_scale: bool = True) -> None:
+        """
+        Displays the given image.
+        
+        Args:
+          img: The image to be displayed.
+          reset_scale: If True, the zoom setting of the viewer will be reset.
+        """
         pixmap = pixmapFromNumpy(img)
         self._img_np = img.copy()
         self._canvas.loadPixmap(pixmap)
@@ -390,7 +419,7 @@ class ImageViewer(QScrollArea):
             self._img_scale = 1.0
         self.paintCanvas()
 
-    def scaleToFitWindow(self):
+    def scaleToFitWindow(self) -> None:
         """Scale the image such that it fills the canvas area."""
         if self._img_np is None:
             return
@@ -404,14 +433,14 @@ class ImageViewer(QScrollArea):
         self._img_scale = w1 / w2 if a2 >= a1 else h1 / h2
         self.paintCanvas()
 
-    def setScale(self, scale):
+    def setScale(self, scale: float) -> None:
         self._img_scale = scale
         self.paintCanvas()
 
-    def scale(self):
+    def scale(self) -> float:
         return self._img_scale
 
-    def paintCanvas(self):
+    def paintCanvas(self) -> None:
         if self._img_np is None:
             return
         self._img_scale = max(self._min_img_scale, self._img_scale)
