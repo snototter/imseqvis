@@ -53,8 +53,15 @@ python -m pip install "imseqvis[pyside2]"
 python -m pip install "imseqvis[pyside6]"
 ```
 
-### Usage
+### Usage as Standalone Application
+To quickly visualize all images within a folder (and nothing else), you can use the provided to start a standalone GUI application:
+```python
+import imseqvis
+imseqvis.show('path/to/images')
+```
 
+### Usage as Widget
+To integrate the viewer into your own application, use the `ImageSequenceViewer` widget.
 ```python
 # Prepare the image data source. This must allow random access to the images.
 # See the provided data sources within the examples/ folder for best practices.
