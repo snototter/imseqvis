@@ -15,7 +15,13 @@ python -m pip install -U pip
 
 Then, simply install `imseqvis` via:
 ```bash
-python -m pip install git+https://github.com/snototter/imseqvis.git
+python -m pip install imseqvis
+```
+
+If you want to try the latest alpha, i.e. the latest `main` branch packaged and
+published to [TestPyPI](https://test.pypi.org/), you can instead install it via:
+```bash
+python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple "imseqvis[pyside2]"
 ```
 
 ### Qt Backend
@@ -29,22 +35,22 @@ Optionally, you can install `imseqvis` with a specific backend. Currently,
 `pyqt5`, `pyqt6`, `pyside2`, and `pyside6` are supported:
 ```bash
 # PyQt5
-python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyqt5]"
+python -m pip install "imseqvis[pyqt5]"
 
 # OR
 
 # PyQt6
-python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyqt6]"
+python -m pip install "imseqvis[pyqt6]"
 
 # OR
 
 # PySide2
-python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyside2]"
+python -m pip install "imseqvis[pyside2]"
 
 # OR
 
 # PySide6
-python -m pip install "git+https://github.com/snototter/imseqvis.git#egg=imseqvis[pyside6]"
+python -m pip install "imseqvis[pyside6]"
 ```
 
 ### Usage
@@ -75,3 +81,4 @@ More detailed usage examples are provided within `examples/`:
 * `examples/demo_standalone.py` demonstrates the basic usage with a dummy
   sequence.
 * `examples/demo_folder.py` will playback all images within a local folder.
+
