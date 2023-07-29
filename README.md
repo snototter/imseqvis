@@ -1,4 +1,5 @@
 # Image & Sequence Visualization
+[![View on PyPI](https://img.shields.io/pypi/v/imseqvis.svg)](https://pypi.org/project/imseqvis)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/snototter/imseqvis/blob/main/LICENSE?raw=true)
 
 This package provides GUI widgets to show images and playback image sequences.
