@@ -1,12 +1,16 @@
 from pathlib import Path
 
 
-def show(folder: Path, **kwargs) -> int:
+def show(
+        folder: Path,
+        window_title: str = "Image Folder Viewer",
+        **kwargs) -> int:
     """
     Runs the ImageSequenceViewer for the given folder.
 
     Args:
       folder: Path to the folder containing the images.
+      window_title: The title of the application window.
       kwargs: Additional arguments passed to the SequenceViewer.
     
     Returns:
@@ -21,7 +25,7 @@ def show(folder: Path, **kwargs) -> int:
     viewer = SequenceViewer(image_sequence=seq, **kwargs)
 
     # Run the application
-    viewer.setWindowTitle("Image Folder Viewer")
+    viewer.setWindowTitle(window_title)
     viewer.show()
     
     return app.exec()
