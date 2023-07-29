@@ -73,7 +73,5 @@ viewer.setSequence(new_sequence)
 
 More detailed usage examples are provided within `examples/`:
 * `examples/demo_standalone.py` demonstrates the basic usage with a dummy
-  sequence. It will run out-of-the-box.
+  sequence.
 * `examples/demo_folder.py` will playback all images within a local folder.
-  This demo additionally requires the [vito](https://pypi.org/project/vito/)
-  package to load image files.

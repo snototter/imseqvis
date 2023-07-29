@@ -8,7 +8,7 @@ name = "imseqvis"
 description = "A Qt-based image sequence visualizer widget"
 readme = "README.md"
 
-version = "0.1.1"
+version = "0.1.2"
 license = {file = "LICENSE"}
 
 authors = [

@@ -1,3 +1,13 @@
+"""
+This demo shows how to instantiate the SequenceViewer, create an
+application and use some of its signals.
+
+If you only want to show an image folder, a simpler way would be:
+```python
+import imseqvis
+imseqvis.show("path/to/folder")
+```
+"""
 from imseqvis.sequence_viewer import SequenceViewer, ImageFolder
 import sys
 from pathlib import Path
@@ -6,7 +16,7 @@ from qtpy.QtWidgets import QApplication
 
 if __name__ == "__main__":
     FOLDER = Path(__file__).parent
-    
+
     # The image data source
     sequence = ImageFolder(FOLDER)
 
@@ -28,4 +38,4 @@ if __name__ == "__main__":
     # Run the application
     viewer.setWindowTitle("Image Folder Viewer")
     viewer.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

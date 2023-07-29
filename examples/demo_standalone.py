@@ -86,4 +86,4 @@ if __name__ == "__main__":
     # Run the application
     viewer.setWindowTitle("Demo Viewer")
     viewer.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
