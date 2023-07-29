@@ -1,10 +1,13 @@
-name: Publish Releases to PyPI
+name: Publish Release to PyPI
 on: release
 
 jobs:
   package-upload:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -23,5 +26,3 @@ jobs:
           .
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
