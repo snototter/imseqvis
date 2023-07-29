@@ -139,7 +139,8 @@ class SequenceControlWidget(QWidget):
         self.label_current_value = QLabel('')
         # Add minor padding to the label
         self.label_current_value.setFixedWidth(max_label_width + 10)
-        self.label_current_value.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.label_current_value.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
         # Buttons to zoom the image viewer
         button_zoom_fit = QToolButton()
