@@ -1,9 +1,59 @@
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 from qtpy.QtCore import Signal, QPointF
 from pathlib import Path
+import numpy as np
+from vito import imutils
+from natsort import natsorted
+from typing import List
 
 from .image_viewer import ImageViewer
 from .control_widget import SequenceControlWidget
+
+
+class ImageSequence(object):
+    """
+    Provides random access to a list of image files.
+    """
+    def __init__(self, files: List[Path]):
+        """
+        Creates the image sequence.
+
+        Args:
+          files: List of image files.
+        """
+        self.files = files
+    
+    def __len__(self) -> int:
+        return len(self.files)
+
+    def __getitem__(self, index: int) -> np.array:
+        return imutils.imread(self.files[index])
+
+
+class ImageFolder(ImageSequence):
+    """
+    Provides a random access sequence of images from a local folder.
+    """
+    def __init__(
+            self,
+            folder: Path,
+            image_extensions: List[str] = ['.png', '.jpg', '.jpeg']):
+        """
+        Creates the image sequence.
+
+        Args:
+          folder: Path to the folder containing the images.
+          image_extensions: The file extensions to consider as images.
+        """
+        if not isinstance(folder, Path):
+            folder = Path(folder)
+        if not folder.is_dir():
+            raise ValueError(f'Folder "{folder}" is not a directory!')
+
+        files = natsorted(
+            [f for f in folder.iterdir() if f.is_file()
+             and f.suffix in image_extensions])
+        super().__init__(files)
 
 
 class SequenceViewer(QWidget):

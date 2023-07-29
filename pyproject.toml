@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "imseqvis"
 
-description = "Simple image sequence visualizer based on Qt"
+description = "A Qt-based image sequence visualizer widget"
 readme = "README.md"
 
-version = "0.1.0"
+version = "0.1.1"
 license = {file = "LICENSE"}
 
 authors = [
@@ -18,9 +18,11 @@ authors = [
 requires-python = ">=3.7"
 
 dependencies = [
+    "natsort",
     "numpy",
     "qimage2ndarray",
-    "qtpy"
+    "qtpy",
+    "vito"
 ]
 
 

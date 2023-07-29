@@ -1,39 +1,7 @@
-from imseqvis.sequence_viewer import SequenceViewer
-import numpy as np
+from imseqvis.sequence_viewer import SequenceViewer, ImageFolder
 import sys
 from pathlib import Path
-
-try:
-    from vito import imutils
-except ImportError as e:
-    print('\n************************************************\n')
-    print('This example requires vito to load images.')
-    print('Please install via:\n')
-    print('    python -m pip install vito\n')
-    print('************************************************\n')
-    raise e
-
 from qtpy.QtWidgets import QApplication
-
-
-class ImageFolder(object):
-    """
-    Simple demo sequence that allows you to visualize all images within a
-    local folder.
-    """
-    def __init__(self, folder: Path):
-        assert folder.is_dir(), f'{folder} is not a directory'
-
-        self.files = sorted(
-            [f for f in folder.iterdir() if f.is_file()
-             and f.suffix in ['.png', '.jpg', '.jpeg']])
-        assert len(self.files) > 0, f'No images found in {folder}'
-    
-    def __len__(self) -> int:
-        return len(self.files)
-    
-    def __getitem__(self, index: int) -> np.array:
-        return imutils.imread(self.files[index])
 
 
 if __name__ == "__main__":
