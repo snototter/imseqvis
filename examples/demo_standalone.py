@@ -1,3 +1,7 @@
+"""
+This demo shows how to instantiate the SequenceViewer, create an
+application and use some of its signals.
+"""
 from imseqvis.sequence_viewer import SequenceViewer
 import numpy as np
 import sys

@@ -38,34 +38,46 @@ Optionally, you can install `imseqvis` with a specific backend. Currently,
 # PyQt5
 python -m pip install "imseqvis[pyqt5]"
 
-# OR
-
-# PyQt6
+# OR PyQt6
 python -m pip install "imseqvis[pyqt6]"
 
-# OR
-
-# PySide2
+# OR PySide2
 python -m pip install "imseqvis[pyside2]"
 
-# OR
-
-# PySide6
+# OR PySide6
 python -m pip install "imseqvis[pyside6]"
 ```
 
 ### Usage as Standalone Application
-To quickly visualize all images within a folder (and nothing else), you can use the provided to start a standalone GUI application:
+To quickly visualize all images within a folder or sequence (and nothing else),
+you can use the provided wrappers to start a standalone GUI application:
+```python
+import imseqvis
+# Show all images in the given folder.
+imseqvis.show_folder('path/to/images')
+
+# Show all images in a random access container. For an exemplary data source
+# refer to `imseqvis.sequence_viewer.ImageSequence`.
+sequence = [...]
+imseqvis.show_sequence(sequence)
+```
+
+Alternatively, you could simply use the provided `show` functionality:
 ```python
 import imseqvis
 imseqvis.show('path/to/images')
+
+sequence = [...]
+imseqvis.show(sequence)
 ```
 
 ### Usage as Widget
-To integrate the viewer into your own application, use the `ImageSequenceViewer` widget.
+To integrate the viewer into your own application, use the `ImageSequenceViewer`
+widget:
 ```python
 # Prepare the image data source. This must allow random access to the images.
-# See the provided data sources within the examples/ folder for best practices.
+# For an exemplary data source refer to
+# `imseqvis.sequence_viewer.ImageSequence`.
 sequence = [...]
 
 # Create & use the widget.
@@ -85,8 +97,9 @@ To show a different sequence within the same viewer, simply call:
 viewer.setSequence(new_sequence)
 ```
 
-More detailed usage examples are provided within `examples/`:
+More detailed usage examples are provided within `examples/`. These also
+demonstrate how to use the available signals to be notified of the user's
+interactions with the viewer:
 * `examples/demo_standalone.py` demonstrates the basic usage with a dummy
   sequence.
 * `examples/demo_folder.py` will playback all images within a local folder.
-
