@@ -34,6 +34,12 @@ def show_sequence(
     shortcut_zoom_original = QShortcut(QKeySequence('Ctrl+1'), viewer)
     shortcut_zoom_original.activated.connect(viewer.zoomOriginalSize)
 
+    shortcut_zoom_in = QShortcut(QKeySequence('Ctrl++'), viewer)
+    shortcut_zoom_in.activated.connect(viewer.zoomIn)
+
+    shortcut_zoom_in = QShortcut(QKeySequence('Ctrl+-'), viewer)
+    shortcut_zoom_in.activated.connect(viewer.zoomOut)
+
     # Add keyboard shortcut to focus onto the "jump to" input field.
     shortcut_jump = QShortcut(QKeySequence('Ctrl+J'), viewer)
     shortcut_jump.activated.connect(viewer.focusOnManualInput)

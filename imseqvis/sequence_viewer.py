@@ -168,6 +168,16 @@ class SequenceViewer(QWidget):
         self.viewer.setScale(1)
 
     @Slot()
+    def zoomIn(self):
+        """Zooms in by 1 step, identical to 1 click of the mouse wheel."""
+        self.viewer.zoom(120)  # Mouse wheel deltas are 120 per step.
+
+    @Slot()
+    def zoomOut(self):
+        """Zooms out by 1 step, identical to 1 click of the mouse wheel."""
+        self.viewer.zoom(-120)
+
+    @Slot()
     def focusOnManualInput(self):
         """Sets the focus to the manual input field."""
         self.controls.focusOnManualInput()
