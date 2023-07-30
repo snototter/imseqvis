@@ -19,17 +19,30 @@ def show_sequence(
     Returns:
       The application's exit code.
     """
-    from qtpy.QtWidgets import QApplication
+    from qtpy.QtWidgets import QApplication, QShortcut
+    from qtpy.QtGui import QKeySequence
     import sys
     from .sequence_viewer import SequenceViewer
 
     app = QApplication(sys.argv)
     viewer = SequenceViewer(image_sequence=image_sequence, **kwargs)
 
-    # Run the application
+    # Add keyboard shortcuts for zooming.
+    shortcut_zoom_fit = QShortcut(QKeySequence('Ctrl+F'), viewer)
+    shortcut_zoom_fit.activated.connect(viewer.zoomFitToWindow)
+
+    shortcut_zoom_original = QShortcut(QKeySequence('Ctrl+1'), viewer)
+    shortcut_zoom_original.activated.connect(viewer.zoomOriginalSize)
+
+    # Add keyboard shortcut to focus onto the "jump to" input field.
+    shortcut_jump = QShortcut(QKeySequence('Ctrl+J'), viewer)
+    shortcut_jump.activated.connect(viewer.focusOnManualInput)
+
+    # Run the application.
     viewer.setWindowTitle(window_title)
     viewer.show()
-
+    viewer.resize(
+        QApplication.desktop().availableGeometry(viewer).size() * 0.7)
     return app.exec()
 
 
