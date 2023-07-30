@@ -189,7 +189,7 @@ class SequenceControlWidget(QWidget):
         # * Left/Right/PageUp/PageDown - these are handled by the slider and
         #   overriding them here would be confusing for the user (e.g.
         #   inconsistent step sizes).
-        if event.key() == Qt.Key_Escape:
+        if event.key() in [Qt.Key_Escape, Qt.Key_R]:
             self.resetSlider()
         elif event.key() in [Qt.Key_P, Qt.Key_X]:
             self.togglePlayback()
@@ -201,8 +201,6 @@ class SequenceControlWidget(QWidget):
             self.skip(self.button_next_frame, +1)
         elif event.key() == Qt.Key_M:
             self.skip(self.button_next_frame, +10)
-        elif event.key() == Qt.Key_R:
-            self.resetSlider()
 
     def sliderValueChanged(self, value):
         self.is_viewer_ready = False
