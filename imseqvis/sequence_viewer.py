@@ -58,7 +58,15 @@ class ImageFolder(ImageSequence):
 
 class SequenceViewer(QWidget):
     """
-    TODO doc FIXME
+    A widget to display a sequence of images.
+
+    The current image is displayed within a zoom- and scrollable area.
+    The sequence can be navigated using playback controls and key
+    bindings:
+    * x/p: Toggle play/pause.
+    * b/n: Jump to previous/next image.
+    * v/m: Skip 10 images backward/forward.
+    * 'r'/ESC: Reset the sequence (jump to first image).
     """
     # The user wants to advance to the previous sequence. Only available if
     # the sequence navigation buttons have been enabled.
