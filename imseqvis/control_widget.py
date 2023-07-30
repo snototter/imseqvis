@@ -1,6 +1,6 @@
 from qtpy.QtWidgets import (
     QWidget, QHBoxLayout, QSlider, QLineEdit, QLabel, QToolButton)
-from qtpy.QtCore import Qt, Signal, QTimer
+from qtpy.QtCore import Qt, Signal, Slot, QTimer
 from qtpy.QtGui import QIcon, QFontMetrics
 
 
@@ -67,6 +67,7 @@ class SequenceControlWidget(QWidget):
 
         self.initUI(include_sequence_navigation_buttons, include_zoom_buttons)
 
+    @Slot(int)
     def setMaxValue(self, max_value):
         self.max_value = max_value
         self.slider.setRange(1, self.max_value)
@@ -74,6 +75,7 @@ class SequenceControlWidget(QWidget):
             QFontMetrics(self.font()).width(str(self.max_value)) + 10)
         self.updateSlider(1)
 
+    @Slot()
     def onViewerReady(self):
         self.is_viewer_ready = True
 
@@ -84,19 +86,19 @@ class SequenceControlWidget(QWidget):
         # List of theme icon names:
         # https://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
 
-        # Automatic playback button (toggles between play/pause)
+        # Automatic playback button (toggles between play/pause).
         self.button_playback = QToolButton()
         self.button_playback.setIcon(QIcon.fromTheme('media-playback-start'))
         self.button_playback.setToolTip('Toggle play/pause')
         self.button_playback.clicked.connect(self.togglePlayback)
 
-        # Reset button
+        # Reset button to skip to the first frame.
         button_reload = QToolButton()
         button_reload.setIcon(QIcon.fromTheme('view-refresh'))
         button_reload.setToolTip('Reset sequence')
         button_reload.clicked.connect(self.resetSlider)
 
-        # Navigation buttons (step forward/backward)
+        # Navigation buttons (step forward/backward).
         self.button_previous_frame = QToolButton()
         self.button_previous_frame.setIcon(QIcon.fromTheme('go-previous'))
         self.button_previous_frame.setToolTip('Previous frame')
@@ -109,7 +111,7 @@ class SequenceControlWidget(QWidget):
         self.button_next_frame.clicked.connect(
             lambda: self.skip(self.button_next_frame, +1))
 
-        # Navigation buttons (skip to previous/next sequence)
+        # Navigation buttons (skip to previous/next sequence).
         button_previous_sequence = QToolButton()
         button_previous_sequence.setIcon(QIcon.fromTheme('go-up'))
         button_previous_sequence.setToolTip('Previous sequence')
@@ -120,29 +122,29 @@ class SequenceControlWidget(QWidget):
         button_next_sequence.setToolTip('Next sequence')
         button_next_sequence.clicked.connect(self.nextSequenceRequest)
 
-        # The slider
+        # The slider.
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(1, self.max_value)
         self.slider.setMinimumWidth(100)
         self.slider.valueChanged.connect(
             lambda value: self.sliderValueChanged(value))
 
-        # Text box to manually set the slider value
+        # Text box to manually set the slider value.
         self.manual_input = QLineEdit()
         self.manual_input.setFixedWidth(100)
         self.manual_input.setPlaceholderText('Jump to:')
         self.manual_input.setToolTip('Enter frame to jump to')
         self.manual_input.returnPressed.connect(self.updateSliderFromTextBox)
 
-        # Label to display the current value
+        # Label to display the current value.
         max_label_width = QFontMetrics(self.font()).width(str(self.max_value))
         self.label_current_value = QLabel('')
-        # Add minor padding to the label
+        # Add minor padding to the label.
         self.label_current_value.setFixedWidth(max_label_width + 10)
         self.label_current_value.setAlignment(
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        # Buttons to zoom the image viewer
+        # Buttons to zoom the image viewer.
         button_zoom_fit = QToolButton()
         button_zoom_fit.setIcon(QIcon.fromTheme('zoom-fit-best'))
         button_zoom_fit.setToolTip('Fit to window')
@@ -153,7 +155,7 @@ class SequenceControlWidget(QWidget):
         button_zoom_original.setToolTip('Show at original size')
         button_zoom_original.clicked.connect(self.zoomOriginalSizeRequest)
 
-        # Align all controls horizontally
+        # Align all controls horizontally.
         layout = QHBoxLayout()
         if include_sequence_navigation_buttons:
             layout.addWidget(button_previous_sequence)
@@ -173,7 +175,7 @@ class SequenceControlWidget(QWidget):
             layout.addWidget(button_zoom_original)
 
         self.setLayout(layout)
-        # Emit signal & update labels
+        # Emit signal & update labels.
         self.sliderValueChanged(1)
 
     def keyPressEvent(self, event):
@@ -217,7 +219,7 @@ class SequenceControlWidget(QWidget):
         if not button.isEnabled():
             return
         self.updateSlider(self.slider.value() + step)
-        # A manual fwd/bwd request always stops the playback
+        # A manual fwd/bwd request always stops the playback.
         self.stopPlayback()
 
     def stopPlayback(self):
@@ -226,7 +228,7 @@ class SequenceControlWidget(QWidget):
 
     def startPlayback(self):
         if self.slider.value() >= self.max_value:
-            # Restart playback from the beginning
+            # Restart playback from the beginning.
             self.updateSlider(1)
         self.playback_timer.start(self.playback_timeout)
         self.button_playback.setIcon(QIcon.fromTheme('media-playback-pause'))
@@ -239,7 +241,7 @@ class SequenceControlWidget(QWidget):
 
     def onPlaybackTimeout(self):
         if self.playback_wait_for_viewer_ready and not self.is_viewer_ready:
-            # Skip this timeout if the viewer has not shown the last image yet
+            # Skip this timeout if the viewer has not shown the last image yet.
             return
         value = self.slider.value() + 1
         if value <= self.max_value:
@@ -248,18 +250,24 @@ class SequenceControlWidget(QWidget):
             self.stopPlayback()
 
     def updateSlider(self, value):
-        # Update the slider and label with the new value
+        # Update the slider and label with the new value.
         if 1 <= value <= self.max_value:
             self.slider.setValue(value)
             self.label_current_value.setText(str(value))
 
     def updateSliderFromTextBox(self):
-        # Get the value from the text box
+        # Get the value from the text box.
         try:
             value = int(self.manual_input.text())
             self.stopPlayback()
             self.updateSlider(value)
         except ValueError:
             pass
-        # Always reset the input text box
+        # Always reset the input text box.
         self.manual_input.setText('')
+    
+    @Slot()
+    def focusOnManualInput(self):
+        """Focus the manual input text box and select all text."""
+        self.manual_input.setFocus()
+        self.manual_input.selectAll()

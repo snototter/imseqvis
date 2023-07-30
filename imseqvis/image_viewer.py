@@ -59,7 +59,7 @@ def getLocalPathFromMimeData(mime_data: QMimeData) -> Path:
     Returns the path of a file or folder dropped onto the canvas.
     """
     if mime_data.hasUrls():
-        # Return the first locally existing file
+        # Return the first locally existing file.
         for url in mime_data.urls():
             fpath = Path(url.toLocalFile())
             if fpath.exists():
@@ -103,7 +103,7 @@ class ImageCanvas(QWidget):
         self._scale = 1.0
         self._pixmap = QPixmap()
         self._painter = QPainter()
-        # Indicates whether the user is currently dragging the image
+        # Indicates whether the user is currently dragging the image.
         self._is_dragging = False
         # Previous dragging position, relative to the parent widget, i.e. the
         # position within the ImageViewer's scroll area.
@@ -133,7 +133,7 @@ class ImageCanvas(QWidget):
         """Event handle for mouse move events."""
         pos = self.transformPos(event.pos())
         if Qt.RightButton & event.buttons():
-            # Skip mouse move signals while panning the image
+            # Skip mouse move signals while panning the image.
             self._is_dragging = True
             self.drag(event.pos())
         else:
@@ -147,7 +147,7 @@ class ImageCanvas(QWidget):
         positions according to the given mouse position.
         """
         new_pos = self.mapToParent(new_pos)
-        # Previous position will always be set when the mouse is pressed
+        # Previous position will always be set when the mouse is pressed.
         delta_pos = new_pos - self._prev_drag_pos
         dx = int(delta_pos.x())
         dy = int(delta_pos.y())
@@ -166,7 +166,7 @@ class ImageCanvas(QWidget):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Event handler for mouse press events."""
         if event.button() == Qt.RightButton:
-            # Viewer can be panned via the right button
+            # Viewer can be panned via the right button.
             self._prev_drag_pos = self.mapToParent(event.pos())
             QApplication.setOverrideCursor(Qt.ClosedHandCursor)
 
@@ -279,7 +279,7 @@ class ImageViewer(QScrollArea):
     https://github.com/snototter/iminspect
     """
 
-    # Mouse moved to this pixel position
+    # Mouse moved to this pixel position.
     mouseMoved = Signal(QPointF)
 
     # Left mouse button clicked at this pixel position.
@@ -291,13 +291,13 @@ class ImageViewer(QScrollArea):
     # Right mouse button clicked at this pixel position.
     mouseClickedRight = Signal(QPointF)
 
-    # Scaling factor of displayed image changed
+    # Scaling factor of displayed image changed.
     imageScaleChanged = Signal(float)
 
-    # The view changed due to the user scrolling or zooming
+    # The view changed due to the user scrolling or zooming.
     viewChanged = Signal()
 
-    # A file or folder has been dropped onto the canvas
+    # A file or folder has been dropped onto the canvas.
     pathDropped = Signal(Path)
 
     def __init__(self, parent=None):
@@ -394,7 +394,7 @@ class ImageViewer(QScrollArea):
         self._canvas.showPixmap(pixmap)
 
         # Ensure that image has a minimum size of about 32x32 px (unless it is
-        # actually smaller)
+        # actually smaller).
         self._min_img_scale = min(1.0, 32.0/img.shape[0], 32.0/img.shape[1])
 
         if reset_scale:
@@ -405,7 +405,7 @@ class ImageViewer(QScrollArea):
         """Scale the image such that it fills the canvas area."""
         if self._img_np is None:
             return
-        eps = 2.0  # Prevent scrollbars
+        eps = 2.0  # Minor spacing needed to prevent showing scrollbars.
         w1 = self.width() - eps
         h1 = self.height() - eps
         a1 = w1 / h1

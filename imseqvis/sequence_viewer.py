@@ -1,5 +1,5 @@
 from qtpy.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
-from qtpy.QtCore import Signal, QPointF
+from qtpy.QtCore import Signal, Slot, QPointF
 from pathlib import Path
 import numpy as np
 from vito import imutils
@@ -58,7 +58,7 @@ class ImageFolder(ImageSequence):
 
 class SequenceViewer(QWidget):
     """
-    TODO doc
+    TODO doc FIXME
     """
     # The user wants to advance to the previous sequence. Only available if
     # the sequence navigation buttons have been enabled.
@@ -140,14 +140,34 @@ class SequenceViewer(QWidget):
         self.controls.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.controls.nextSequenceRequest.connect(self.nextSequenceRequest)
         self.controls.previousSequenceRequest.connect(self.previousSequenceRequest)
-        self.controls.zoomFitToWindowRequest.connect(self.viewer.scaleToFitWindow)
-        self.controls.zoomOriginalSizeRequest.connect(lambda: self.viewer.setScale(1))
+        self.controls.zoomFitToWindowRequest.connect(self.zoomFitToWindow)
+        self.controls.zoomOriginalSizeRequest.connect(self.zoomOriginalSize)
 
         # Layouting.
         layout = QVBoxLayout()
         layout.addWidget(self.viewer)
         layout.addWidget(self.controls)
         self.setLayout(layout)
+
+    @Slot()
+    def zoomFitToWindow(self):
+        """Scales the image such that it fits the available space."""
+        self.viewer.scaleToFitWindow()
+    
+    @Slot()
+    def zoomOriginalSize(self):
+        """Displays the image in its original size."""
+        self.viewer.setScale(1)
+
+    @Slot()
+    def focusOnManualInput(self):
+        """Sets the focus to the manual input field."""
+        self.controls.focusOnManualInput()
+    
+    @Slot()
+    def togglePlayback(self):
+        """Toggles the playback."""
+        self.controls.togglePlayback()
 
     def keyPressEvent(self, event):
         # Forward key events to the control widget.
