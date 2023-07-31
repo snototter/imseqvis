@@ -6,7 +6,7 @@ from qtpy.QtWidgets import QWidget, QScrollArea, QApplication
 from qtpy.QtCore import Qt, QPointF, Signal, Slot, QRect, QMimeData
 from qtpy.QtGui import (
     QPixmap, QImage, QFont, QPainter, QPen, QColor, QBrush, QPalette,
-    QMouseEvent)
+    QMouseEvent, QCursor)
 
 
 def pixmapFromNumpy(img_np: np.array) -> QPixmap:
@@ -359,8 +359,22 @@ class ImageViewer(QScrollArea):
         Usually to be called with mouse wheel delta values, thus
         the actual zoom steps are computed as delta/120.
         """
+        cursor_pos = QCursor().pos()
+        px_pos_prev = self._canvas.pixelAtWidgetPos(
+            self._canvas.mapFromGlobal(cursor_pos))
         self._img_scale += 0.05 * delta / 120
         self.paintCanvas()
+        # Adjust the scroll bar positions to keep cursor at the same pixel
+        px_pos_curr = self._canvas.pixelAtWidgetPos(
+            self._canvas.mapFromGlobal(cursor_pos))
+        delta_widget = self._canvas.pixelToWidgetPos(px_pos_curr) \
+            - self._canvas.pixelToWidgetPos(px_pos_prev)
+        self.scrollRelative(
+            delta_widget.x()*120/self.horizontalScrollBar().singleStep(),
+            Qt.Horizontal)
+        self.scrollRelative(
+            delta_widget.y()*120/self.verticalScrollBar().singleStep(),
+            Qt.Vertical)
 
     @Slot(int, int)
     def scrollRelative(self, delta, orientation):
