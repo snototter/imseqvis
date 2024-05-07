@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "imseqvis"
+dynamic = ["version"]
 
 description = "A Qt-based image sequence visualizer widget"
 readme = "README.md"
 
-version = "0.2.3"
 license = {file = "LICENSE"}
 
 authors = [
@@ -48,3 +48,6 @@ pyside6 = ["PySide6"]
 
 [tool.setuptools]
 packages = ["imseqvis"]
+
+[tool.setuptools.dynamic]
+version = {attr = "imseqvis.__version__"}
