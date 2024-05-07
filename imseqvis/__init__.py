@@ -70,7 +70,7 @@ def show_folder(
       The application's exit code.
     """
     from .sequence_viewer import ImageFolder
-    return show_sequence(ImageFolder(folder))
+    return show_sequence(ImageFolder(folder), window_title, **kwargs)
 
 
 def show(
