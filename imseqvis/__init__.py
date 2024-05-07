@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Union
 
+__version__ = "0.2.3"
+
 
 def show_sequence(
         image_sequence,
