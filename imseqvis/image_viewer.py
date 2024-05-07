@@ -388,6 +388,8 @@ class ImageViewer(QScrollArea):
     def scrollAbsolute(self, value, orientation):
         """Sets the scrollbar to the given value."""
         bar = self._scoll_bars[orientation]
+        # Ensure that value is an integer to prevent TypeError within bar.setValue()
+        value = int(value)
         if value < bar.minimum():
             value = bar.minimum()
         if value > bar.maximum():
