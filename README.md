@@ -11,18 +11,18 @@ It is highly recommended to set up a separate virtual environment with an up-to-
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-python -m pip install -U pip
+python3 -m pip install -U pip
 ```
 
 Then, simply install `imseqvis` via:
 ```bash
-python -m pip install imseqvis
+python3 -m pip install imseqvis
 ```
 
 If you want to try the latest alpha, i.e. the latest `main` branch packaged and
 published to [TestPyPI](https://test.pypi.org/), you can instead install it via:
 ```bash
-python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple "imseqvis[pyside2]"
+python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple "imseqvis[pyside2]"
 ```
 
 ### Qt Backend
@@ -36,25 +36,31 @@ Optionally, you can install `imseqvis` with a specific backend. Currently,
 `pyqt5`, `pyqt6`, `pyside2`, and `pyside6` are supported:
 ```bash
 # PyQt5
-python -m pip install "imseqvis[pyqt5]"
+python3 -m pip install "imseqvis[pyqt5]"
 
 # OR PyQt6
-python -m pip install "imseqvis[pyqt6]"
+python3 -m pip install "imseqvis[pyqt6]"
 
 # OR PySide2
-python -m pip install "imseqvis[pyside2]"
+python3 -m pip install "imseqvis[pyside2]"
 
 # OR PySide6
-python -m pip install "imseqvis[pyside6]"
+python3 -m pip install "imseqvis[pyside6]"
 ```
 
 ### Usage as Standalone Application
 To quickly visualize all images within a folder or sequence (and nothing else),
 you can use the provided wrappers to start a standalone GUI application:
+```bash
+python3 -m imseqvis path/to/image-folder
+```
+
+Or start the viewer from within your code, either specifically for a folder
+or iterable image sequence (*i.e.* a random access container of NumPy [ndarrays](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)):
 ```python
 import imseqvis
 # Show all images in the given folder.
-imseqvis.show_folder('path/to/images')
+imseqvis.show_folder('path/to/image-folder')
 
 # Show all images in a random access container. For an exemplary data source
 # refer to `imseqvis.sequence_viewer.ImageSequence`.
@@ -65,7 +71,7 @@ imseqvis.show_sequence(sequence)
 Alternatively, you could simply use the provided `show` functionality:
 ```python
 import imseqvis
-imseqvis.show('path/to/images')
+imseqvis.show('path/to/image-folder')
 
 sequence = [...]
 imseqvis.show(sequence)
