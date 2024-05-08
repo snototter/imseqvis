@@ -22,7 +22,7 @@ def show_sequence(
       The application's exit code.
     """
     from qtpy.QtWidgets import QApplication, QShortcut
-    from qtpy.QtGui import QKeySequence
+    from qtpy.QtGui import QKeySequence, QGuiApplication
     import sys
     from .sequence_viewer import SequenceViewer
 
@@ -50,7 +50,7 @@ def show_sequence(
     viewer.setWindowTitle(window_title)
     viewer.show()
     viewer.resize(
-        QApplication.desktop().availableGeometry(viewer).size() * 0.7)
+        QGuiApplication.primaryScreen().availableGeometry().size() * 0.7)
     return app.exec()
 
 
