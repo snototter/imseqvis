@@ -160,8 +160,8 @@ class ImageCanvas(QWidget):
         # than scrolling with the mouse wheel. On my gnome-based system, a
         # factor of 6 means that the dragged image follows exactly the
         # mouse pointer...
-        dx and self.scrollRequest.emit(dx * 6, Qt.Horizontal)
-        dy and self.scrollRequest.emit(dy * 6, Qt.Vertical)
+        dx and self.scrollRequest.emit(dx * 6, Qt.Horizontal.value)
+        dy and self.scrollRequest.emit(dy * 6, Qt.Vertical.value)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Event handler for mouse press events."""
@@ -198,8 +198,8 @@ class ImageCanvas(QWidget):
             if modifiers & Qt.ShiftModifier:
                 dx *= 10
                 dy *= 10
-            dx and self.scrollRequest.emit(dx, Qt.Horizontal)
-            dy and self.scrollRequest.emit(dy, Qt.Vertical)
+            dx and self.scrollRequest.emit(dx, Qt.Horizontal.value)
+            dy and self.scrollRequest.emit(dy, Qt.Vertical.value)
         event.accept()
 
     def dragEnterEvent(self, event):
@@ -337,9 +337,9 @@ class ImageViewer(QScrollArea):
 
         self.setWidget(self._canvas)
         self.setWidgetResizable(True)
-        self._scoll_bars = {
-            Qt.Vertical: self.verticalScrollBar(),
-            Qt.Horizontal: self.horizontalScrollBar()
+        self._scroll_bars = {
+            Qt.Vertical.value: self.verticalScrollBar(),
+            Qt.Horizontal.value: self.horizontalScrollBar()
         }
         # Observe the valueChanged signal so we know whether the user dragged
         # a scroll bar or used the keyboard (e.g. arrow keys) to adjust the
@@ -379,15 +379,19 @@ class ImageViewer(QScrollArea):
     @Slot(int, int)
     def scrollRelative(self, delta, orientation):
         """Slot for scrollRequest signal of image canvas."""
+        if orientation not in self._scroll_bars:
+            return
         steps = -delta / 120
-        bar = self._scoll_bars[orientation]
+        bar = self._scroll_bars[orientation]
         value = bar.value() + bar.singleStep() * steps
         self.scrollAbsolute(value, orientation)
 
     @Slot(int, int)
     def scrollAbsolute(self, value, orientation):
         """Sets the scrollbar to the given value."""
-        bar = self._scoll_bars[orientation]
+        if orientation not in self._scroll_bars:
+            return
+        bar = self._scroll_bars[orientation]
         # Ensure that value is an integer to prevent TypeError within bar.setValue()
         value = int(value)
         if value < bar.minimum():
