@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 
 
 def show_sequence(

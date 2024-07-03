@@ -147,14 +147,24 @@ class SequenceControlWidget(QWidget):
         self.label_current_value.setAlignment(
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
+        # TODO Add icons as assets to the imseqvis package, so we don't need to
+        #   rely on the system's icon theme. Needed to hard-code a fallback
+        #   path for now, assuming a standard Ubuntu setup.
+        
         # Buttons to zoom the image viewer.
         button_zoom_fit = QToolButton()
-        button_zoom_fit.setIcon(QIcon.fromTheme('zoom-fit-best'))
+        button_zoom_fit.setIcon(
+            QIcon.fromTheme(
+                'zoom-fit-best',
+                QIcon('/usr/share/icons/Humanity/actions/16/zoom-best-fit.svg')))
         button_zoom_fit.setToolTip('Fit to window')
         button_zoom_fit.clicked.connect(self.zoomFitToWindowRequest)
 
         button_zoom_original = QToolButton()
-        button_zoom_original.setIcon(QIcon.fromTheme('zoom-original'))
+        button_zoom_original.setIcon(
+            QIcon.fromTheme(
+                'zoom-original',
+                QIcon('/usr/share/icons/Humanity/actions/16/view-restore.svg')))
         button_zoom_original.setToolTip('Show at original size')
         button_zoom_original.clicked.connect(self.zoomOriginalSizeRequest)
 
