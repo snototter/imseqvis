@@ -79,6 +79,9 @@ class SequenceControlWidget(QWidget):
     def onViewerReady(self):
         self.is_viewer_ready = True
 
+    def currentIndex(self) -> int:
+        return self.slider.value()
+
     def initUI(
             self,
             include_sequence_navigation_buttons: bool,

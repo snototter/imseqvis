@@ -1,4 +1,4 @@
-from qtpy.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
+from qtpy.QtWidgets import QApplication, QWidget, QVBoxLayout, QSizePolicy
 from qtpy.QtCore import Signal, Slot, QPointF
 from pathlib import Path
 import numpy as np
@@ -6,7 +6,7 @@ from vito import imutils
 from natsort import natsorted
 from typing import List
 
-from .image_viewer import ImageViewer
+from .image_viewer import ImageViewer, pixmapFromNumpy
 from .control_widget import SequenceControlWidget
 
 
@@ -28,6 +28,9 @@ class ImageSequence(object):
 
     def __getitem__(self, index: int) -> np.array:
         return imutils.imread(self.files[index])
+    
+    def filename(self, index: int) -> Path:
+        return Path(self.files[index])
 
 
 class ImageFolder(ImageSequence):
@@ -186,6 +189,23 @@ class SequenceViewer(QWidget):
     def togglePlayback(self):
         """Toggles the playback."""
         self.controls.togglePlayback()
+    
+    @Slot()
+    def copyFilenameToClipboard(self):
+        """Copies the current image to the clipboard."""
+        # The control is 1-based, but the sequence index is 0-based.
+        idx = self.controls.currentIndex() - 1
+        if hasattr(self.image_sequence, 'filename'):
+            txt = self.image_sequence.filename(idx)
+        else:
+            txt = idx
+        QApplication.clipboard().setText(str(txt))
+    
+    @Slot()
+    def copyImageToClipboard(self):
+        """Copies the current image to the clipboard."""
+        QApplication.clipboard().setPixmap(
+            pixmapFromNumpy(self.image_sequence[self.controls.currentIndex() - 1]))
 
     def keyPressEvent(self, event):
         # Forward key events to the control widget.

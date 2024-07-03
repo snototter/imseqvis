@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union
 
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 
 def show_sequence(
@@ -45,6 +45,13 @@ def show_sequence(
     # Add keyboard shortcut to focus onto the "jump to" input field.
     shortcut_jump = QShortcut(QKeySequence('Ctrl+J'), viewer)
     shortcut_jump.activated.connect(viewer.focusOnManualInput)
+
+    # Clipboard shortcuts
+    shortcut_cp_filename = QShortcut(QKeySequence('Ctrl+Shift+C'), viewer)
+    shortcut_cp_filename.activated.connect(viewer.copyFilenameToClipboard)
+
+    shortcut_cp_image = QShortcut(QKeySequence('Ctrl+C'), viewer)
+    shortcut_cp_image.activated.connect(viewer.copyImageToClipboard)
 
     # Run the application.
     viewer.setWindowTitle(window_title)
