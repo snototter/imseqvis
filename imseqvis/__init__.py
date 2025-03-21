@@ -31,7 +31,6 @@ def show_sequence(
     else:
         app = QApplication.instance()
     viewer = SequenceViewer(image_sequence=image_sequence, **kwargs)
-    viewer = SequenceViewer(image_sequence=image_sequence, **kwargs)
 
     # Add keyboard shortcuts for zooming.
     shortcut_zoom_fit = QShortcut(QKeySequence('Ctrl+F'), viewer)
