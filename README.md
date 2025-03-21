@@ -48,6 +48,15 @@ python3 -m pip install "imseqvis[pyside2]"
 python3 -m pip install "imseqvis[pyside6]"
 ```
 
+In order to use PySide, the environmental variable `QT_DRIVER` should be set (as
+this will be checked by `qimage2ndarray`). For example, to use `pyside6`:
+```python
+import os
+os.environ['QT_DRIVER'] = 'PySide6'
+...
+imseqvis.show_sequence(...)
+```
+
 ### Usage as Standalone Application
 To quickly visualize all images within a folder or sequence (and nothing else),
 you can use the provided wrappers to start a standalone GUI application:
